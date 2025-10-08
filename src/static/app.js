@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear loading message
       activitiesList.innerHTML = "";
 
-      // Populate activities list
-      Object.entries(activities).forEach(([name, details]) => {
+          participantsHTML = `
+            <div class=\"participants-section\">\n              <strong>Participants:</strong>\n              <ul class=\"participants-list\">\n                ${details.participants.map(email => `<li><span class=\"participant-email\">${email}</span> <span class=\"delete-participant\" data-activity=\"${name}\" data-email=\"${email}\" title=\"Remove\">🗑️</span></li>`).join("")}\n              </ul>\n            </div>\n          `;
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
@@ -62,6 +62,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+              // Aggiungi event listener per cancellazione partecipante
+              document.querySelectorAll('.delete-participant').forEach(icon => {
+                icon.addEventListener('click', async (e) => {
+                  const activity = icon.getAttribute('data-activity');
+                  const email = icon.getAttribute('data-email');
+                  if (confirm(`Rimuovere ${email} da ${activity}?`)) {
+                    try {
+                      const res = await fetch(`/activities/${activity}/participants/${email}`, {
+                        method: 'DELETE'
+                      });
+                      if (res.ok) {
+                        fetchActivities(); // aggiorna la lista
+                      } else {
+                        alert('Errore nella rimozione.');
+                      }
+                    } catch {
+                      alert('Errore di rete.');
+                    }
+                  }
+                });
+              });
+
+              // Popola select attività
+              activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
+              Object.keys(activities).forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                activitySelect.appendChild(option);
+              });
   // Handle form submission
   signupForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -83,6 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        fetchActivities(); // aggiorna la lista delle attività
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";

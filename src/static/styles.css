@@ -159,11 +159,23 @@ footer {
 }
 
 .participants-list {
-  list-style-type: disc;
-  margin-left: 20px;
+  list-style: none;
+  margin-left: 0;
   margin-bottom: 0;
   color: #333;
   font-size: 15px;
+  padding-left: 0;
+}
+
+.delete-participant {
+  cursor: pointer;
+  margin-left: 8px;
+  color: #d32f2f;
+  font-size: 1.1em;
+  transition: color 0.2s;
+}
+.delete-participant:hover {
+  color: #b71c1c;
 }
 
 .no-participants {
